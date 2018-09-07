@@ -17,29 +17,34 @@ void blur(const cv::Mat& input, cv::Mat& output)
 
   int flr = floor (N/2.0);
 
-  for (int iy = flr; iy < input.rows-flr; iy++)
+  for (int iy = 0; iy < input.rows; iy++)
   {
-    for (int ix = flr; ix < input.cols-flr; ix++)
+    for (int ix = 0; ix < input.cols; ix++)
     {
       int bAvg = 0;
       int grAvg = 0;
       int rAvg = 0;
+			int matAvg = 0;
 
       for (int i = -flr; i <= flr; i++)
       {
         for (int j = -flr; j <= flr; j++)
         {
-          int iyn = iy+i;
-          int ixn = ix+j;
-          bAvg += input.at<cv::Vec3b>(iyn,ixn)[0];
-          grAvg += input.at<cv::Vec3b>(iyn,ixn)[1];
-          rAvg += input.at<cv::Vec3b>(iyn,ixn)[2];
+					int iyn = iy+i;
+					int ixn = ix+j;
+					if(iyn>=0 && ixn >=0 && iyn<=input.rows && ixn<=input.cols)
+					{
+						matAvg+=1;
+						bAvg += input.at<cv::Vec3b>(iyn,ixn)[0];
+						grAvg += input.at<cv::Vec3b>(iyn,ixn)[1];
+						rAvg += input.at<cv::Vec3b>(iyn,ixn)[2];
+					}
         }
       }
 
-      output.at<cv::Vec3b>(iy,ix)[0] = bAvg/(N*N);
-      output.at<cv::Vec3b>(iy,ix)[1] = grAvg/(N*N);
-      output.at<cv::Vec3b>(iy,ix)[2] = rAvg/(N*N);
+			output.at<cv::Vec3b>(iy,ix)[0] = bAvg/(matAvg);
+      output.at<cv::Vec3b>(iy,ix)[1] = grAvg/(matAvg);
+      output.at<cv::Vec3b>(iy,ix)[2] = rAvg/(matAvg);
 
     }
   }
