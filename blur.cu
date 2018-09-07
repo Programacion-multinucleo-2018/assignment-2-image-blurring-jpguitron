@@ -10,7 +10,7 @@
 
 #include <chrono>
 
-#define N 41//Change bluring window size
+#define N 5//Change bluring window size
 
 using namespace std;
 
@@ -23,7 +23,7 @@ __global__ void blur_kernel(unsigned char* input, unsigned char* output, int wid
 	int flr = floor (N/2.0);
 
 	//Avoiding edge pixels
-	if ((xIndex < width-flr) && (yIndex < height-flr) && (flr < xIndex) && (flr < yIndex))
+	if ((xIndex <= width) && (yIndex <= height) && (0 <= xIndex) && (0 <= yIndex))
 	{
 		//Current pixel
 		const int tid = yIndex * step + (3 * xIndex);
@@ -31,12 +31,14 @@ __global__ void blur_kernel(unsigned char* input, unsigned char* output, int wid
 		int bAvg = 0;
 		int grAvg = 0;
 		int rAvg = 0;
+		int matAvg = 0;
 
 		//Get the average of the surrounding pixels
 		for (int i = -flr; i <= flr; i++)
 		{
 			for (int j = -flr; j <= flr; j++)
 			{
+				matAvg+=1;
 				const int tid = (yIndex+i) * step + (3 * (xIndex+j));
 				bAvg += input[tid];
 				grAvg += input[tid + 1];
@@ -45,9 +47,9 @@ __global__ void blur_kernel(unsigned char* input, unsigned char* output, int wid
 		}
 
 		//Changing the central pixel with the average of the others
-		output[tid] = static_cast<unsigned char>(bAvg/(N*N));
-		output[tid+1] = static_cast<unsigned char>(grAvg/(N*N));
-		output[tid+2] = static_cast<unsigned char>(rAvg/(N*N));
+		output[tid] = static_cast<unsigned char>(bAvg/(matAvg));
+		output[tid+1] = static_cast<unsigned char>(grAvg/(matAvg));
+		output[tid+2] = static_cast<unsigned char>(rAvg/(matAvg));
 	}
 }
 
