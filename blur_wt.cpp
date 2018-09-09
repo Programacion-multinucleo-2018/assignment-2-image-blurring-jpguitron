@@ -15,7 +15,6 @@ using namespace std;
 void blur(const cv::Mat& input, cv::Mat& output)
 {
 	cout << "Input image step: " << input.step << " rows: " << input.rows << " cols: " << input.cols << endl;
-
   int flr = floor (N/2.0);
 
 	int iy;
@@ -29,7 +28,6 @@ void blur(const cv::Mat& input, cv::Mat& output)
   {
     for (ix = 0; ix < input.cols; ix++)
     {
-
       int bAvg = 0;
       int grAvg = 0;
       int rAvg = 0;
@@ -43,7 +41,7 @@ void blur(const cv::Mat& input, cv::Mat& output)
 
 					int iyn = iy+i;
 					int ixn = ix+j;
-					if(iyn>=0 && ixn >=0 && iyn<=input.rows && ixn<=input.cols)
+					if(iyn>0 && ixn >0 && iyn<input.rows && ixn<input.cols)
 					{
 						matAvg+=1;
 						bAvg += input.at<cv::Vec3b>(iyn,ixn)[0];
@@ -56,10 +54,8 @@ void blur(const cv::Mat& input, cv::Mat& output)
       output.at<cv::Vec3b>(iy,ix)[0] = bAvg/(matAvg);
       output.at<cv::Vec3b>(iy,ix)[1] = grAvg/(matAvg);
       output.at<cv::Vec3b>(iy,ix)[2] = rAvg/(matAvg);
-
     }
   }
-
 }
 
 int main(int argc, char *argv[])
@@ -83,7 +79,9 @@ int main(int argc, char *argv[])
 
 	//Create output image
 	cv::Mat output(input.rows, input.cols, CV_8UC3);//Resultado a color
-  output = input.clone();//preguntar de esta linea
+  output = input.clone();
+
+	omp_set_num_threads(4);
 
 	//Execute blur function and measure time
 	auto start_cpu =  chrono::high_resolution_clock::now();

@@ -21,9 +21,10 @@ __global__ void blur_kernel(unsigned char* input, unsigned char* output, int wid
 	const int yIndex = blockIdx.y * blockDim.y + threadIdx.y;
 
 	int flr = floor (N/2.0);
+	int matAvg = 0;
 
 	//Avoiding edge pixels
-	if ((xIndex <= width) && (yIndex <= height) && (0 <= xIndex) && (0 <= yIndex))
+	if ((xIndex < width) && (yIndex < height))
 	{
 		//Current pixel
 		const int tid = yIndex * step + (3 * xIndex);
@@ -31,18 +32,23 @@ __global__ void blur_kernel(unsigned char* input, unsigned char* output, int wid
 		int bAvg = 0;
 		int grAvg = 0;
 		int rAvg = 0;
-		int matAvg = 0;
+
 
 		//Get the average of the surrounding pixels
 		for (int i = -flr; i <= flr; i++)
 		{
 			for (int j = -flr; j <= flr; j++)
 			{
-				matAvg+=1;
+
+
 				const int tid = (yIndex+i) * step + (3 * (xIndex+j));
-				bAvg += input[tid];
-				grAvg += input[tid + 1];
-				rAvg += input[tid + 2];
+				if(xIndex+i>0 && yIndex+i>0 && xIndex+i<width && yIndex+i<height )
+				{
+					matAvg+=1;
+					bAvg += input[tid];
+					grAvg += input[tid + 1];
+					rAvg += input[tid + 2];
+				}
 			}
 		}
 
@@ -120,6 +126,7 @@ int main(int argc, char *argv[])
 	auto end_cpu =  chrono::high_resolution_clock::now();
 	chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
 	printf("elapsed %f ms\n", duration_ms.count());
+
 
 	//Allow the windows to resize
 	namedWindow("Input", cv::WINDOW_NORMAL);

@@ -32,8 +32,9 @@ void blur(const cv::Mat& input, cv::Mat& output)
         {
 					int iyn = iy+i;
 					int ixn = ix+j;
-					if(iyn>=0 && ixn >=0 && iyn<=input.rows && ixn<=input.cols)
+					if(iyn>0 && ixn >0 && iyn<input.rows && ixn<input.cols)
 					{
+
 						matAvg+=1;
 						bAvg += input.at<cv::Vec3b>(iyn,ixn)[0];
 						grAvg += input.at<cv::Vec3b>(iyn,ixn)[1];
@@ -78,7 +79,8 @@ int main(int argc, char *argv[])
   blur(input, output);
   auto end_cpu =  chrono::high_resolution_clock::now();
   chrono::duration<float, std::milli> duration_ms = end_cpu - start_cpu;
-  printf("elapsed %f ms\n", duration_ms.count());
+	printf("elapsed %f ms\n", duration_ms.count());
+
 
 	//Allow the windows to resize
 	namedWindow("Input", cv::WINDOW_NORMAL);
