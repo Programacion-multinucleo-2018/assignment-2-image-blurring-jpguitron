@@ -42,7 +42,7 @@ __global__ void blur_kernel(unsigned char* input, unsigned char* output, int wid
 
 
 				const int tid = (yIndex+i) * step + (3 * (xIndex+j));
-				if(xIndex+i>0 && yIndex+i>0 && xIndex+i<width && yIndex+i<height )
+				if(xIndex+j>0 && yIndex+i>0 && xIndex+j<width && yIndex+i<height )
 				{
 					matAvg+=1;
 					bAvg += input[tid];
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
 
 	//Create output image
 	cv::Mat output(input.rows, input.cols, CV_8UC3);
-	output = input.clone();
+	//output = input.clone();
 	//Execute blur function and measure time
 	auto start_cpu =  chrono::high_resolution_clock::now();
 	blur(input, output);
